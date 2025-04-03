@@ -27,25 +27,13 @@ const registerUser: Controller = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const verificationToken = nanoid(12);
-
   const newUser = await authServices.registerUser({
     username,
     email,
     password: hashPassword,
-    verificationToken,
+    verificationToken: null,
+    isVerified: true, 
   });
-
-  const BASE_URL = env('BASE_URL');
-
-  const data = {
-    to: email,
-    subject: 'Confirm your registration in TaskPro app',
-    text: 'Press on the link to confirm your email',
-    html: `Good day! Please click on the following link to confirm your account in TaskPro app. <a href="${BASE_URL}/auth/verify/${verificationToken}" target="_blank" rel="noopener noreferrer">Confirm my mail</a>`,
-  };
-
-  sendMail(data);
 
   res.json({
     status: 201,
@@ -73,13 +61,6 @@ const loginUser: Controller = async (req, res) => {
 
   if (!passwordCompare) {
     throw new HttpError(400, 'Email or password invalid');
-  }
-
-  if (!user.isVerified) {
-    throw new HttpError(
-      403,
-      'User mail is not verified, please check your mail for following instructions'
-    );
   }
 
   const { _id } = user;
@@ -148,8 +129,6 @@ const patchUser: Controller = async (req, res) => {
   };
 
   let hashPassword;
-  let verificationToken;
-  let isVerified;
   let avatarUrl;
 
   if (password) {
@@ -164,20 +143,6 @@ const patchUser: Controller = async (req, res) => {
         'Cannot change email to that which is already occupied.'
       );
     }
-
-    const BASE_URL = env('BASE_URL');
-
-    verificationToken = nanoid(12);
-    isVerified = false;
-
-    const data = {
-      to: email,
-      subject: 'Confirm your registration in TaskPro app',
-      text: 'Press on the link to confirm your email',
-      html: `Good day! Please click on the following link to confirm your account in TaskPro app. <a href="${BASE_URL}/auth/verify/${verificationToken}" target="_blank" rel="noopener noreferrer">Confirm my mail</a>`,
-    };
-
-    sendMail(data);
   }
 
   if (req?.file?.path) {
@@ -191,7 +156,6 @@ const patchUser: Controller = async (req, res) => {
       await fs.unlink(req.file.path);
     } catch (error) {
       await fs.unlink(req.file.path);
-
       throw error;
     }
   }
@@ -204,8 +168,6 @@ const patchUser: Controller = async (req, res) => {
       password: hashPassword,
       theme,
       avatarUrl,
-      isVerified,
-      verificationToken,
     }
   );
 
@@ -455,10 +417,8 @@ export default {
   registerUser: ctrlWrapper(registerUser),
   loginUser: ctrlWrapper(loginUser),
   logoutUser: ctrlWrapper(logoutUser),
-  verifyUser: ctrlWrapper(verifyUser),
   getCurrentUser: ctrlWrapper(getCurrentUser),
   patchUser: ctrlWrapper(patchUser),
-  resendVerifyMessage: ctrlWrapper(resendVerifyMessage),
   refreshTokens: ctrlWrapper(refreshTokens),
   googleAuth: ctrlWrapper(googleAuth),
   googleRedirect: ctrlWrapper(googleRedirect),

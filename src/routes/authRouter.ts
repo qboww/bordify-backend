@@ -11,7 +11,6 @@ import {
   patchSchema,
   refreshSchema,
   registerSchema,
-  resendVerifyMessageSchema,
 } from '../schemas/authSchemas';
 
 import validateBody from '../helpers/validateBody';
@@ -242,66 +241,6 @@ authRouter.patch(
   isEmptyBody,
   validateBody(patchSchema),
   authControllers.patchUser
-);
-
-/**
- * @openapi
- * /api/auth/update:
- *   patch:
- *     tags:
- *       - Auth
- *     summary: Update user information
- *     requestBody:
- *       content:
- *         multipart/form-data:
- *           schema:
- *             $ref: '#/components/schemas/PatchUser'
- *
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: User details updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 data:
- *                   type: object
- *                   properties:
- *                     username:
- *                       type: string
- *                       example: 'updatedUser123'
- *                     email:
- *                       type: string
- *                       format: email
- *                       example: 'updateduser@example.com'
- *                     theme:
- *                       type: string
- *                       example: 'light'
- *                     avatarUrl:
- *                       type: string
- *                       format: uri
- *                       example: 'http://example.com/new-avatar.jpg'
- *               required:
- *                 - status
- *                 - data
- *       408:
- *         description: Email already in use
- *       500:
- *         description: Internal server error
- */
-
-authRouter.get('/verify/:verificationToken', authControllers.verifyUser);
-
-authRouter.post(
-  '/verify',
-  validateBody(resendVerifyMessageSchema),
-  authControllers.resendVerifyMessage
 );
 
 /**
