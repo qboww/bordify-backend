@@ -23,24 +23,50 @@ dotenv.config();
 
 const startServer = async () => {
   const PORT = env('PORT');
+  const FRONTEND_URL = env('FRONTEND_URL');
+  const BASE_URL = env('BASE_URL');
+
   const app = express();
+
+  // Enhanced CORS configuration for Google OAuth
+  const corsOptions = {
+    origin: [
+      FRONTEND_URL,
+      BASE_URL,
+      'https://accounts.google.com', // Google OAuth domain
+      'https://www.googleapis.com'  // Google API domain
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin'
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
+    maxAge: 86400 // 24 hours
+  };
+
+  // Apply CORS middleware
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
 
   app.use(express.static(publicDirPath));
   app.use(morgan('tiny'));
-  app.use(cors());
   app.use(express.json());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+  // Routes
   app.use('/api/auth', authRouter);
-
   app.use('/api', taskRouter);
-
   app.use('/api', columnRouter);
-
   app.use('/api', boardRouter);
-
   app.use('/api/support', supportRouter);
 
+  // Error handling
   app.use((_, res) => {
     res.status(404).json({ message: 'Route not found' });
   });
@@ -49,13 +75,23 @@ const startServer = async () => {
     if (err instanceof HttpError) {
       res.status(err.statusCode).json({ message: err.message });
     } else {
-      console.log(err);
+      console.error('Server error:', err);
       res.status(500).json({ message: 'An unexpected error occurred' });
     }
   });
 
+  // Security headers middleware
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', corsOptions.origin.join(', '));
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+  });
+
   app.listen(PORT, () => {
-    console.log(`server started on ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Frontend URL: ${FRONTEND_URL}`);
+    console.log(`Base URL: ${BASE_URL}`);
+    console.log('CORS configured for origins:', corsOptions.origin);
   });
 };
 

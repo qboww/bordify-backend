@@ -299,8 +299,8 @@ const refreshTokens: Controller = async (req, res) => {
 
 const googleAuth: Controller = async (req, res) => {
   const stringifiedParams = queryString.stringify({
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: `${env('BASE_URL')}/auth/google-redirect`,
+    client_id: process.env.GOOGLE_AUTH_CLIENT_ID,
+    redirect_uri: `${env('BASE_URL')}/api/auth/google-redirect`,
     scope: [
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
@@ -325,9 +325,9 @@ const googleRedirect: Controller = async (req, res) => {
     url: `https://oauth2.googleapis.com/token`,
     method: 'post',
     data: {
-      client_id: env('GOOGLE_CLIENT_ID'),
-      client_secret: env('GOOGLE_CLIENT_SECRET'),
-      redirect_uri: `${env('BASE_URL')}/auth/google-redirect`,
+      client_id: env('GOOGLE_AUTH_CLIENT_ID'),
+      client_secret: env('GOOGLE_AUTH_CLIENT_SECRET'),
+      redirect_uri: `${env('BASE_URL')}/api/auth/google-redirect`,
       grant_type: 'authorization_code',
       code,
     },
