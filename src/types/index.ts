@@ -7,7 +7,7 @@ export interface RequestWithUser extends Request {
     username: string;
     email: string;
     avatarUrl: string | null;
-    theme: 'light' | 'dark' | 'violet';
+    theme: 'light' | 'dark' | 'cyan';
     isVerified: boolean;
   };
 }
@@ -68,7 +68,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatarUrl: string | null;
-  theme: 'light' | 'dark' | 'violet';
+  theme: 'light' | 'dark' | 'cyan';
   isVerified: boolean;
   verificationToken: string | null;
 }

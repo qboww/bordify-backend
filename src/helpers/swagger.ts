@@ -69,7 +69,7 @@ const swaggerOptions = {
             },
             theme: {
               type: 'string',
-              enum: ['light', 'dark', 'violet'],
+              enum: ['light', 'dark', 'cyan'],
               example: 'dark',
               default: 'light',
             },
