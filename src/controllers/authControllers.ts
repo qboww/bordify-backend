@@ -26,18 +26,34 @@ const registerUser: Controller = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const verificationToken = nanoid(12);
 
   const newUser = await authServices.registerUser({
     username,
     email,
     password: hashPassword,
-    verificationToken: null,
-    isVerified: true, 
+    verificationToken,
+    isVerified: false, 
+    avatarUrl: null
+  });
+
+  const verificationUrl = `${env('FRONTEND_URL')}/bordify/verify-email?token=${verificationToken}`;
+
+  await sendMail({
+    to: email,
+    subject: 'Verify your Bordify account',
+    html: `
+      <h2>Welcome to Bordify!</h2>
+      <p>Please verify your email by clicking this link:</p>
+      <a href="${verificationUrl}">Verify Email</a>
+      <p>Or copy this URL to your browser:</p>
+      <p>${verificationUrl}</p>
+    `
   });
 
   res.json({
     status: 201,
-    message: 'User successfully registered',
+    message: 'Registration successful! Please check your email to verify your account',
     data: {
       username: newUser.username,
       email: newUser.email,
@@ -62,6 +78,11 @@ const loginUser: Controller = async (req, res) => {
   if (!passwordCompare) {
     throw new HttpError(400, 'Email or password invalid');
   }
+
+  if (!user.isVerified) {
+    throw new HttpError(403, 'Please verify your email first');
+  }
+
 
   const { _id } = user;
 
@@ -315,6 +336,29 @@ const googleAuth: Controller = async (req, res) => {
   );
 };
 
+const verifyEmail: Controller = async (req, res) => {
+  const { token } = req.params;
+
+  const user = await authServices.findUser({ verificationToken: token });
+  
+  if (!user) {
+    throw new HttpError(400, 'Invalid or expired verification link');
+  }
+
+  await authServices.updateUser(
+    { _id: user._id },
+    { 
+      isVerified: true,
+      verificationToken: null 
+    }
+  );
+
+  res.json({
+    status: 200,
+    message: 'Email verified successfully!'
+  });
+};
+
 const googleRedirect: Controller = async (req, res) => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const urlObj = new URL(fullUrl);
@@ -422,4 +466,5 @@ export default {
   refreshTokens: ctrlWrapper(refreshTokens),
   googleAuth: ctrlWrapper(googleAuth),
   googleRedirect: ctrlWrapper(googleRedirect),
+  verifyEmail: ctrlWrapper(verifyEmail)
 };

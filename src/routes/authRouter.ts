@@ -283,4 +283,6 @@ authRouter.get('/google', authControllers.googleAuth);
 
 authRouter.get('/google-redirect', authControllers.googleRedirect);
 
+authRouter.get('/verify-email/:token', authControllers.verifyEmail);
+
 export default authRouter;
