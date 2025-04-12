@@ -37,7 +37,8 @@ const registerUser: Controller = async (req, res) => {
     avatarUrl: null
   });
 
-  const verificationUrl = `${env('FRONTEND_URL')}/bordify/verify-email?token=${verificationToken}`;
+  const verificationUrl = new URL('/bordify/verify-email', env('FRONTEND_URL'));
+  verificationUrl.searchParams.set('token', verificationToken);
 
   await sendMail({
     to: email,
