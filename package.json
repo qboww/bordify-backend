@@ -15,7 +15,9 @@
     "test": "jest",
     "test:helpers": "jest src/tests/helpers",
     "test:controllers": "jest src/tests/controllers",
-    "test:middlewares": "jest src/tests/middlewares"
+    "test:middlewares": "jest src/tests/middlewares",
+    "test:models": "jest src/tests/models",
+    "test:all": "jest src/tests" 
   },
   "keywords": [],
   "author": "Dmytro Lysachenko <dlysachenko98@gmail.com>",
@@ -58,6 +60,7 @@
     "eslint": "^9.8.0",
     "globals": "^15.9.0",
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
     "nodemon": "^3.1.4",
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.2",
