@@ -1,10 +1,7 @@
 import fs from 'node:fs/promises';
 import jwt from 'jsonwebtoken';
-import path from 'node:path';
 import axios from 'axios';
 import bcrypt from 'bcrypt';
-import queryString from 'query-string';
-import { nanoid } from 'nanoid';
 
 import * as authServices from '../services/authServices';
 
@@ -16,6 +13,8 @@ import { sendMail } from '../helpers/sendEmail';
 
 import { Controller } from '../types';
 
+const generateToken = () => Math.random().toString(36).substring(2, 14);
+
 const registerUser: Controller = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -26,7 +25,7 @@ const registerUser: Controller = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  const verificationToken = nanoid(12);
+  const verificationToken = generateToken();
 
   const newUser = await authServices.registerUser({
     username,
@@ -52,7 +51,7 @@ const registerUser: Controller = async (req, res) => {
     `
   });
 
-  res.json({
+  res.status(201).json({
     status: 201,
     message: 'Registration successful! Please check your email to verify your account',
     data: {
@@ -204,67 +203,6 @@ const patchUser: Controller = async (req, res) => {
   });
 };
 
-const verifyUser: Controller = async (req, res) => {
-  const { verificationToken } = req.params;
-
-  const user = await authServices.findUser({
-    verificationToken,
-  });
-
-  if (!user) {
-    throw new HttpError(400, 'Invalid verification token');
-  }
-
-  if (user.isVerified) {
-    throw new HttpError(400, 'Verification has already been passed');
-  }
-
-  await authServices.updateUser(
-    { verificationToken },
-    { verificationToken: 'User verified', isVerified: true }
-  );
-
-  const root = path.resolve('src', 'constants');
-
-  res.sendFile('htmlPage.html', { root });
-};
-
-const resendVerifyMessage: Controller = async (req, res) => {
-  const { email } = req.body;
-
-  const user = await authServices.findUser({
-    email,
-  });
-
-  if (!user) {
-    throw new HttpError(400, 'Invalid verification token');
-  }
-
-  if (user.isVerified) {
-    throw new HttpError(400, 'Verification has already been passed');
-  }
-
-  const verificationToken = nanoid(12);
-
-  await authServices.updateUser({ email }, { verificationToken });
-
-  const BASE_URL = env('BASE_URL');
-
-  const data = {
-    to: email,
-    subject: 'Confirm your registration in Bordify app',
-    text: 'Press on the link to confirm your email',
-    html: `Good day! Please click on the following link to confirm your account in Bordify app. <a href="${BASE_URL}/auth/verify/${verificationToken}" target="_blank" rel="noopener noreferrer">Confirm my mail</a>`,
-  };
-
-  sendMail(data);
-
-  res.json({
-    status: 200,
-    message: 'New verification email sent',
-  });
-};
-
 const refreshTokens: Controller = async (req, res) => {
   const { sid } = req.body;
   const { authorization } = req.headers;
@@ -320,8 +258,8 @@ const refreshTokens: Controller = async (req, res) => {
 };
 
 const googleAuth: Controller = async (req, res) => {
-  const stringifiedParams = queryString.stringify({
-    client_id: process.env.GOOGLE_AUTH_CLIENT_ID,
+  const params = new URLSearchParams({
+    client_id: process.env.GOOGLE_AUTH_CLIENT_ID!,
     redirect_uri: `${env('BASE_URL')}/api/auth/google-redirect`,
     scope: [
       'https://www.googleapis.com/auth/userinfo.email',
@@ -330,10 +268,10 @@ const googleAuth: Controller = async (req, res) => {
     response_type: 'code',
     access_type: 'offline',
     prompt: 'consent',
-  });
+  }).toString();
 
   return res.redirect(
-    `https://accounts.google.com/o/oauth2/v2/auth?${stringifiedParams}`
+    `https://accounts.google.com/o/oauth2/v2/auth?${params}`
   );
 };
 
@@ -363,8 +301,7 @@ const verifyEmail: Controller = async (req, res) => {
 const googleRedirect: Controller = async (req, res) => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const urlObj = new URL(fullUrl);
-  const urlParams = queryString.parse(urlObj.search);
-  const code = urlParams.code;
+  const code = urlObj.searchParams.get('code');
 
   const tokenData = await axios({
     url: `https://oauth2.googleapis.com/token`,
@@ -422,9 +359,7 @@ const googleRedirect: Controller = async (req, res) => {
     });
 
     return res.redirect(
-      `${env('FRONTEND_URL')}?sid=${newSession._id}&accessToken=${
-        newSession.accessToken
-      }&refreshToken=${newSession.refreshToken}`
+      `${env('FRONTEND_URL')}?sid=${newSession._id}&accessToken=${newSession.accessToken}&refreshToken=${newSession.refreshToken}`
     );
   }
 
@@ -452,11 +387,10 @@ const googleRedirect: Controller = async (req, res) => {
   }
 
   return res.redirect(
-    `${env('FRONTEND_URL')}?sid=${newSession._id}&accessToken=${
-      newSession.accessToken
-    }&refreshToken=${newSession.refreshToken}`
+    `${env('FRONTEND_URL')}?sid=${newSession._id}&accessToken=${newSession.accessToken}&refreshToken=${newSession.refreshToken}`
   );
 };
+
 
 export default {
   registerUser: ctrlWrapper(registerUser),

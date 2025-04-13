@@ -98,10 +98,10 @@ const deleteTask: Controller = async (req, res) => {
 
   const objectTaskId = new Types.ObjectId(taskId);
 
-  taskServices.deleteTaskFromColumn(
+  await taskServices.deleteTaskFromColumn(
     { _id: columnId, boardId, userId },
     objectTaskId
-  );
+  );  
 
   const data = await taskServices.deleteTask({
     _id: taskId,
