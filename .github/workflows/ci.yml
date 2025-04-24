@@ -37,10 +37,3 @@ jobs:
       - name: Run tests
         run: npm test
         working-directory: ./backend
-
-      - name: Archive test results (optional)
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: ./backend/test-results
