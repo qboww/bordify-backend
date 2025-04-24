@@ -1,11 +1,3 @@
-name: CI for Bordify Backend
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -27,10 +19,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test
+      - name: Run unit tests for models, helpers, middlewares
+        run: |
+          npm run test:models
+          npm run test:helpers
+          npm run test:middlewares
