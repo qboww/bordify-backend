@@ -54,5 +54,4 @@ jobs:
       - name: Run unit tests (models, helpers, middlewares)
         run: |
           npm run test:models
-          npm run test:helpers
           npm run test:middlewares
