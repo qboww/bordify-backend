@@ -2,9 +2,9 @@
   "engines": {
     "node": ">=20.6.0"
   },
-  "name": "task-pro-backend",
+  "name": "bordify-backend",
   "version": "1.0.0",
-  "description": "Task pro application back-end based on ts",
+  "description": "bordify-backend app",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -20,7 +20,7 @@
     "test:all": "jest src/tests" 
   },
   "keywords": [],
-  "author": "Dmytro Lysachenko <dlysachenko98@gmail.com>",
+  "author": "Yevhenii Sarancha <zheka78527@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.3",
