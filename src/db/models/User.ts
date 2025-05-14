@@ -26,7 +26,7 @@ const userSchema = new Schema(
     theme: {
       type: String,
       enum: ['light', 'dark', 'cyan'],
-      default: 'light',
+      default: 'dark',
     },
     isVerified: {
       type: Boolean,
