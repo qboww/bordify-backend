@@ -36,8 +36,8 @@ const registerUser: Controller = async (req, res) => {
     avatarUrl: null
   });
 
-  const verificationUrl = new URL('/#/verify-email', env('FRONTEND_URL'));
-  verificationUrl.searchParams.set('token', verificationToken);
+  const verificationUrl = new URL(env('FRONTEND_URL'));
+  verificationUrl.hash = `/verify-email?token=${verificationToken}`;
 
   await sendMail({
     to: email,
