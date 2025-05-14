@@ -387,9 +387,10 @@ const googleRedirect: Controller = async (req, res) => {
     throw new HttpError(400, 'Something went wrong during session creation');
   }
 
-  return res.redirect(
-    `${env('FRONTEND_URL')}?sid=${newSession._id}&accessToken=${newSession.accessToken}&refreshToken=${newSession.refreshToken}`
-  );
+  const redirectUrl = new URL(env('FRONTEND_URL'));
+    redirectUrl.hash = `/auth/google-redirect?sid=${newSession._id}&accessToken=${accessToken}&refreshToken=${refreshToken}`;
+
+    return res.redirect(redirectUrl.toString());
 };
 
 
