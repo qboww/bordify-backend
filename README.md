@@ -5,8 +5,8 @@ Bordify — це RESTful backend для канбан-системи управл
 Проєкт повністю розгорнуто на платформі [Render](https://render.com).
 
 ## 🌐 Пов’язані сервіси
-- Фронтенд частина доступна за адресою: [https://bordify-frontend.onrender.com](https://bordify-frontend.onrender.com)
-- Backend репозиторій доступний за адресою: [https://github.com/qboww/bordify-backend](https://github.com/qboww/bordify-backend)
+- Frontend репозиторій доступний за адресою: [https://github.com/qboww/bordify-frontend](https://github.com/qboww/bordify-frontend)
+- Frontend частина доступна за адресою: [https://bordify-frontend.onrender.com](https://bordify-frontend.onrender.com)
 - Uptime Robot: [![Backend Uptime](https://img.shields.io/uptimerobot/status/m800575843-6d54d4dbb3b8823b35a679ac)](https://stats.uptimerobot.com/3H4vuDHzkP)
 
 ## 📦 Стек технологій
