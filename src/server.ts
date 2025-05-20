@@ -10,6 +10,7 @@ import taskRouter from './routes/taskRouter';
 import boardRouter from './routes/boardRouter';
 import columnRouter from './routes/columnRouter';
 import supportRouter from './routes/supportRouter';
+import pingRouter from './routes/pingRouter';
 
 import { env } from './helpers/env';
 import HttpError from './helpers/HttpError';
@@ -60,6 +61,7 @@ const startServer = async () => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   // Routes
+  app.use('/', pingRouter); 
   app.use('/api/auth', authRouter);
   app.use('/api', taskRouter);
   app.use('/api', columnRouter);
