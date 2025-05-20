@@ -1,1 +1,1 @@
-[![Uptime Robot Status](https://img.shields.io/uptimerobot/status/m788123456-abc1234567?label=Backend%20Uptime)](https://stats.uptimerobot.com/3H4vuDHzkP)
+[![Backend Uptime](https://img.shields.io/uptimerobot/status/3H4vuDHzkP)](https://stats.uptimerobot.com/3H4vuDHzkP)
